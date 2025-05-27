@@ -1,4 +1,4 @@
-function deleteExportedFrames(outputPath, prefix) {
+function deleteExportedFrames(outputPath, prefix, format) {
   try {
     var folder = new Folder(outputPath);
     if (!folder.exists)
@@ -7,7 +7,7 @@ function deleteExportedFrames(outputPath, prefix) {
         error: "Output folder does not exist.",
       });
 
-    var fileMask = prefix.replace(/\[#+\]/g, "*") + ".tif";
+    var fileMask = prefix.replace(/\[#+\]/g, "*") + format;
     var files = folder.getFiles(fileMask);
 
     for (var i = 0; i < files.length; i++) {

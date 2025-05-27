@@ -1,5 +1,7 @@
-function renderCompFrames(outputPath, prefix) {
+function renderCompFrames(outputPath, prefix, format) {
   var renderQueueItem;
+  var undoGroupStarted = false;
+
   try {
     var comp = app.project.activeItem;
 
@@ -10,18 +12,17 @@ function renderCompFrames(outputPath, prefix) {
       });
     }
 
-    while (app.project.renderQueue.numItems > 0) {
-      app.project.renderQueue.item(1).remove();
-    }
+    app.beginUndoGroup("Add PNG Sequence to Render Queue");
+    undoGroupStarted = true;
 
     var renderQueue = app.project.renderQueue;
     renderQueueItem = renderQueue.items.add(comp);
     var outputModule = renderQueueItem.outputModules[1];
+    outputModule.file = new File(outputPath + "/" + prefix + format);
 
-    //Exporting TIFF is much faster than PNG
-    outputModule.applyTemplate("TIFF Sequence with Alpha");
+    //https://github.com/TelegramMessenger/bodymovin-extension/blob/e35d611d1a67f9e6ebf2fecd4fc322447a05927a/bundle/jsx/utils/sourceHelper.jsx#L196
+    outputModule.applyTemplate("_HIDDEN X-Factor 8 Premul");
 
-    outputModule.file = new File(outputPath + "/" + prefix, +".tif");
     renderQueue.render();
 
     // // Poll for completion (prevents blocking)
@@ -35,22 +36,18 @@ function renderCompFrames(outputPath, prefix) {
       }
     }
 
-    if (app.project.renderQueue.items[1].status === RQItemStatus.DONE) {
-      alert("Render succeeded!");
-    } else {
-      alert("Render failed: " + app.project.renderQueue.items[1].status);
-    }
-
     return JSON.stringify({
       success: true,
     });
   } catch (e) {
-    alert("Error during rendering: " + e.message);
     return JSON.stringify({
       success: false,
       error: e.message,
     });
   } finally {
+    if (undoGroupStarted) {
+      app.endUndoGroup();
+    }
     if (renderQueueItem) {
       renderQueueItem.remove();
     }

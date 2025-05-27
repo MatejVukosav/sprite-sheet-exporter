@@ -8,7 +8,7 @@ function getActiveCompInfo() {
         height: comp.height,
         frameRate: comp.frameRate,
         duration: comp.duration,
-        numFrames: Math.ceil(comp.duration * comp.frameRate),
+        numFrames: Math.floor(comp.duration * comp.frameRate),
       });
     }
   } catch (e) {
