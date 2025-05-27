@@ -1,0 +1,21 @@
+* {
+  font-family: sans-serif;
+}
+
+.refresh-btn svg {
+  stroke: #0078d4;
+}
+.refresh-btn:hover svg,
+.refresh-btn:focus svg {
+  stroke: #fff;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(-360deg);
+  }
+}
+
+.refresh-btn.spinning svg {
+  animation: spin 0.7s linear;
+}

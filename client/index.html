@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Sprite Sheet Exporter</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <style>
+      :root {
+        --primary: #0078d4;
+        --primary-dark: #005fa3;
+        --bg: #23272a;
+        --panel: #2c2f33;
+        --border: #444;
+        --text: #e8e8e8;
+        --muted: #a0a0a0;
+        --accent: #fff176;
+        --radius: 10px;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Segoe UI", system-ui, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+      .main-container {
+        max-width: 410px;
+        margin: 32px auto;
+        background: var(--panel);
+        border-radius: var(--radius);
+        box-shadow: 0 4px 24px #0005;
+        border: 1.5px solid var(--border);
+        padding: 30px 28px 28px 28px;
+        position: relative;
+      }
+      .header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 18px;
+      }
+      .header-icon {
+        font-size: 2.1em;
+        color: var(--primary);
+      }
+      .header-title {
+        font-size: 1.5em;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+      .divider {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 18px 0 20px 0;
+      }
+      .comp-empty {
+        text-align: center;
+        padding: 40px 0 36px 0;
+      }
+      .comp-empty h2 {
+        color: var(--accent);
+        font-size: 1.15em;
+        margin-bottom: 10px;
+      }
+      .comp-empty p {
+        color: var(--muted);
+        margin-bottom: 20px;
+        font-size: 1em;
+      }
+      .primary-btn {
+        background: var(--primary);
+        color: #fff;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 5px;
+        font-size: 1.08em;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s;
+        box-shadow: 0 1px 4px #0002;
+      }
+      .primary-btn:hover {
+        background: var(--primary-dark);
+      }
+      .comp-details {
+        margin-top: 6px;
+      }
+      .comp-title-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+      .comp-title {
+        font-size: 1.18em;
+        font-weight: 600;
+        color: #fff;
+        letter-spacing: 0.2px;
+      }
+      .refresh-btn {
+        background: none;
+        border: none;
+        color: var(--primary);
+        font-size: 1.25em;
+        cursor: pointer;
+        border-radius: 50%;
+        padding: 4px 7px;
+        transition: background 0.18s;
+      }
+      .refresh-btn:hover {
+        background: var(--primary);
+        color: #fff;
+      }
+      .details-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px 12px;
+        margin-top: 10px;
+      }
+      .details-grid label {
+        color: var(--muted);
+        font-size: 0.98em;
+      }
+      .details-grid span {
+        display: block;
+        font-size: 1.13em;
+        color: var(--primary);
+        margin-top: 2px;
+      }
+      @media (max-width: 500px) {
+        .main-container {
+          padding: 12px 4px 18px 4px;
+        }
+        .details-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main-container">
+      <div class="header">
+        <span class="header-icon">🖼️</span>
+        <span class="header-title">Sprite Sheet Exporter</span>
+      </div>
+      <hr class="divider" />
+
+      <!-- Show this block if NO comp is selected -->
+      <div class="comp-empty" id="no-comp-panel">
+        <h2>⚠️ No Composition Selected</h2>
+        <p>Please select a composition in After Effects to continue.</p>
+        <button class="primary-btn update-composition-btn">
+          Update Active Composition
+        </button>
+      </div>
+
+      <!-- Show this block if a comp IS selected -->
+      <div class="comp-details" id="comp-details-panel" style="display: none">
+        <div class="comp-title-row">
+          <span class="comp-title" id="comp-name">My Composition</span>
+          <button
+            class="refresh-btn update-composition-btn"
+            title="Update Active Composition"
+            aria-label="Refresh composition"
+            id="refreshCompositionBtn"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#fff"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 5v4h4" />
+              <path d="M4 13a8.1 8.1 0 0 0 15.5 2M20 19v-4h-4" />
+            </svg>
+          </button>
+        </div>
+        <div class="details-grid">
+          <div>
+            <label>Width</label>
+            <span id="comp-width">-</span>
+          </div>
+          <div>
+            <label>Height</label>
+            <span id="comp-height">-</span>
+          </div>
+          <div>
+            <label>Frame Rate</label>
+            <span id="comp-framerate">-</span>
+          </div>
+          <div>
+            <label>Duration</label>
+            <span id="comp-duration">-</span>
+          </div>
+          <div>
+            <label>Frames</label>
+            <span id="comp-numFrames">-</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="CSInterface.js"></script>
+    <script src="index.js"></script>
+  </body>
+</html>
