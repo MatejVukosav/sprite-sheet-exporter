@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <title>Sprite Sheet Exporter</title>
+
     <link rel="stylesheet" type="text/css" href="style.css" />
     <style>
       :root {
@@ -137,7 +138,8 @@
       }
     </style>
   </head>
-  <body>
+  <body onload="onLoaded()">
+    <a href="javascript:history.go(0)">Refresh panel</a>
     <div class="main-container">
       <div class="header">
         <span class="header-icon">🖼️</span>
@@ -155,7 +157,7 @@
       </div>
 
       <!-- Show this block if a comp IS selected -->
-      <div class="comp-details" id="comp-details-panel" style="display: none">
+      <div class="comp-details" id="comp-details-panel" hidden="true">
         <div class="comp-title-row">
           <span class="comp-title" id="comp-name">My Composition</span>
           <button
@@ -202,10 +204,38 @@
             <span id="comp-numFrames">-</span>
           </div>
         </div>
+        <button id="exportSpriteSheet" class="export-btn">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M12 16v-8M8 12l4 4 4-4"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <rect
+              x="4"
+              y="18"
+              width="16"
+              height="2"
+              rx="1"
+              fill="currentColor"
+              opacity="0.15"
+            />
+          </svg>
+          Export Sprite Sheet
+        </button>
       </div>
     </div>
 
-    <script src="CSInterface.js"></script>
-    <script src="index.js"></script>
+    <script type="text/javascript" src="CSInterface.js"></script>
+    <script type="text/javascript" src="ext.js"></script>
+    <script type="text/javascript" src="index.js"></script>
   </body>
 </html>

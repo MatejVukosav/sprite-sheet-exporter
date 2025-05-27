@@ -1,45 +1,90 @@
-const csInterface = new CSInterface();
+document.addEventListener("jsxLoaded", (e) => {
+  console.log("JSX files loaded:", e.detail);
+  updateCompInfo();
+  setupEventHandlers();
+});
 
-document.querySelectorAll(".update-composition-btn").forEach((btn) => {
-  btn.addEventListener("click", function () {
-    updateCompInfo();
+function setupEventHandlers() {
+  document.querySelectorAll(".update-composition-btn").forEach((btn) => {
+    btn.addEventListener("click", function () {
+      updateCompInfo();
+    });
   });
-});
 
-const btn = document.getElementById("refreshCompositionBtn");
+  document
+    .getElementById("refreshCompositionBtn")
+    .addEventListener("click", () => {
+      btn.classList.remove("spinning");
+      void btn.offsetWidth;
+      btn.classList.add("spinning");
+      setTimeout(() => btn.classList.remove("spinning"), 700);
+    });
 
-btn.addEventListener("click", () => {
-  
-  // Remove class if already present to allow retriggering
-  btn.classList.remove("spinning");
-  // Force reflow to restart animation (important for repeated clicks)
-  void btn.offsetWidth;
-  btn.classList.add("spinning");
-  // Remove class after animation completes (700ms)
-  setTimeout(() => btn.classList.remove("spinning"), 700);
-});
+  document
+    .getElementById("exportSpriteSheet")
+    .addEventListener("click", async () => {
+      const outputPath = await chooseOutputFolder();
 
-csInterface.evalScript(
-  `$.evalFile("${csInterface.getSystemPath(
-    SystemPath.EXTENSION
-  )}/host/compositionInfo.jsx")`
-);
+      if (!outputPath) {
+        console.log("No output path selected, aborting render.");
+        return;
+      }
 
-// Update composition info on panel open
-updateCompInfo();
+      const prefix = "frame_[#####]";
+
+      evalScript(
+        `renderCompFrames("${outputPath}", "${prefix}")`,
+        function (result) {
+          try {
+            const res = JSON.parse(result);
+            if (res.success) {
+              console.log("Render completed successfully:", res);
+            } else {
+              console.error("Render failed:", res.error);
+            }
+          } catch (e) {
+            console.error("Error parsing render result:", e);
+          } finally {
+            cleanup();
+          }
+        }
+      );
+    });
+}
+
+function cleanup() {
+  evalScript(
+    `deleteExportedFrames(${JSON.stringify(outputPath)}, ${JSON.stringify(
+      prefix
+    )})`,
+    function (result) {
+      try {
+        const res = JSON.parse(result);
+        console.log("Delete result:", res);
+        if (res) {
+          console.log("Deleted previous frames successfully:", res);
+        } else {
+          console.error("Failed to delete previous frames.");
+        }
+      } catch (e) {
+        console.error("Error parsing delete result:", e);
+      }
+    }
+  );
+}
 
 function updateCompInfo() {
-  csInterface.evalScript("getActiveCompInfo()", function (result) {
+  evalScript("getActiveCompInfo()", function (result) {
     try {
       const comp = JSON.parse(result);
       if (!comp) {
         document.getElementById("no-comp-panel").hidden = false;
-        document.getElementById("comp-details-panel").style.display = "none";
+        document.getElementById("comp-details-panel").hidden = true;
         return;
       }
 
       document.getElementById("no-comp-panel").hidden = true;
-      document.getElementById("comp-details-panel").style.display = "block";
+      document.getElementById("comp-details-panel").hidden = false;
 
       console.log("Active Composition Info:", comp);
       if (comp) {
@@ -74,4 +119,31 @@ function updateCompDetails({
   document.getElementById("comp-framerate").textContent = frameRate + " fps";
   document.getElementById("comp-duration").textContent = duration + " s";
   document.getElementById("comp-numFrames").textContent = numFrames;
+}
+
+async function chooseOutputFolder() {
+  try {
+    const outputPath = await new Promise((resolve, reject) => {
+      csInterface.evalScript(
+        `var folder = Folder.selectDialog("Choose output directory");
+         folder ? folder.fsName : null;`,
+        (result) => {
+          if (result === "null" || result === null) {
+            resolve(null); // User cancelled
+          } else {
+            resolve(result);
+          }
+        }
+      );
+    });
+
+    if (outputPath) {
+      console.log("Selected folder:", outputPath);
+      return outputPath;
+    } else {
+      console.log("User cancelled folder selection");
+    }
+  } catch (e) {
+    console.error("Error:", e);
+  }
 }
