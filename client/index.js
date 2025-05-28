@@ -5,7 +5,6 @@ let currentNumFrames = 0;
 
 // --- Initialization ---
 document.addEventListener("jsxLoaded", (e) => {
-  console.log("JSX files loaded:", e.detail);
   updateCompInfo();
   setupEventHandlers();
 });
@@ -27,11 +26,26 @@ function setupEventHandlers() {
   document
     .getElementById("exportSpriteSheet")
     .addEventListener("click", handleExportSpriteSheet);
+
+  const toggleBtn = document.getElementById("toggleLogsBtn");
+  const logContainer = document.getElementById("logContainer");
+  let logsVisible = false;
+
+  toggleBtn.addEventListener("click", () => {
+    logsVisible = !logsVisible;
+    if (logsVisible) {
+      logContainer.style.display = "block";
+      toggleBtn.textContent = "Hide Logs";
+    } else {
+      logContainer.style.display = "none";
+      toggleBtn.textContent = "Show Logs";
+    }
+  });
 }
 
 async function handleExportSpriteSheet() {
-  // const outputPath = await chooseOutputFolder();
-  const outputPath = "/Users/matejvukosav/Desktop/ae/1";
+  document.getElementById("exportSpriteSheet").disabled = true;
+  const outputPath = await chooseOutputFolder();
 
   if (!outputPath) {
     console.log("No output path selected, aborting render.");
@@ -41,31 +55,54 @@ async function handleExportSpriteSheet() {
   const prefix = "frame_[#####]";
   const format = ".png";
 
+  await showProgressBar();
+  await updateProgressBar(20);
+
   evalScript(
     `renderCompFrames("${outputPath}", "${prefix}", "${format}")`,
     async (result) => {
-      try {
-        const res = JSON.parse(result);
-        if (res.success) {
-          console.log("Render completed successfully:", res);
-
-          await createSpritesheetNode(
-            outputPath + "/" + prefix,
-            0,
-            currentNumFrames - 1,
-            outputPath,
-            format
-          );
-        } else {
-          console.error("Render failed:", res.error);
-        }
-      } catch (e) {
-        console.error("Error parsing render result:", e);
-      } finally {
-        cleanup(outputPath, prefix);
-      }
+      await processRender(result, outputPath, prefix, format);
     }
   );
+}
+
+async function processRender(result, outputPath, prefix, format) {
+  try {
+    const res = JSON.parse(result);
+    if (res.success) {
+      console.log("Render completed successfully:", res);
+      await updateProgressBar(50);
+
+      await createSpritesheet(
+        outputPath + "/" + prefix,
+        0,
+        currentNumFrames - 1,
+        outputPath,
+        format
+      );
+      await updateProgressBar(100);
+      evalScript(
+        `openFolder(${JSON.stringify(outputPath)})`,
+        function (result) {
+          if (result === "true") {
+            console.log("Folder opened!");
+          } else {
+            console.error("Folder not found!");
+          }
+        }
+      );
+    } else {
+      console.error("Render failed:", res.error);
+      hideProgressBar();
+    }
+  } catch (e) {
+    console.error("Error parsing render result:", e);
+    hideProgressBar();
+  } finally {
+    cleanup(outputPath, prefix, format);
+    setTimeout(hideProgressBar, 500);
+    document.getElementById("exportSpriteSheet").disabled = false;
+  }
 }
 
 // --- Composition Info ---
@@ -131,23 +168,45 @@ function generateFrameFilenames(pattern, start, end, ext) {
   return files;
 }
 
-async function createSpritesheetNode(
+async function createSpritesheet(
   pattern,
   startFrame,
   endFrame,
   outputPath,
   format
 ) {
+  console.log("Creating spritesheet");
   const framePaths = generateFrameFilenames(
     pattern,
     startFrame,
     endFrame,
     format
   );
-  const images = await Promise.all(framePaths.map(loadImage));
+
+  let loadedImages = 0;
+  // Load images with progress update
+  const images = [];
+  let lastReportedProgress = 50;
+  for (const framePath of framePaths) {
+    const img = await loadImage(framePath);
+    images.push(img);
+
+    loadedImages++;
+    var progress = 50 + Math.floor((loadedImages / framePaths.length) * 40);
+    // Only update progress bar if progress advanced by at least 5%
+    if (
+      progress >= lastReportedProgress + 5 ||
+      loadedImages === framePaths.length - 1
+    ) {
+      lastReportedProgress = progress;
+      await updateProgressBar(progress);
+    }
+  }
 
   const totalFrames = images.length;
-  if (totalFrames === 0) throw new Error("No images loaded for spritesheet.");
+  if (totalFrames === 0) {
+    throw new Error("No images loaded for spritesheet.");
+  }
 
   const { width: originalWidth, height: originalHeight } = images[0];
 
@@ -174,6 +233,7 @@ async function createSpritesheetNode(
   }
 
   // Create canvas and draw spritesheet
+  console.log("Create canvas and draw spritesheet");
   const canvas = document.createElement("canvas");
   canvas.width = frameWidth * cols;
   canvas.height = frameHeight * rows;
@@ -195,6 +255,12 @@ async function createSpritesheetNode(
       frameWidth,
       frameHeight
     );
+
+    // Update progress bar 90% to 98%
+    if (i % Math.ceil(totalFrames / 20) === 0 || i === totalFrames - 1) {
+      const progress = 90 + Math.floor((i / (totalFrames - 1)) * 8);
+      await updateProgressBar(progress);
+    }
   }
 
   const spritesheetFileName = "spritesheet.png";
@@ -249,11 +315,11 @@ function detectMaxCanvasSize() {
 }
 
 // Cleanup exported frames
-function cleanup(outputPath, prefix) {
+function cleanup(outputPath, prefix, format) {
   evalScript(
     `deleteExportedFrames(${JSON.stringify(outputPath)}, ${JSON.stringify(
       prefix
-    )})`,
+    )},${JSON.stringify(format)})`,
     (result) => {
       try {
         const res = JSON.parse(result);
@@ -320,4 +386,82 @@ function generateFrameData(
     JSON.stringify(data, null, 2)
   );
   console.log("Generated frame data JSON at:", path.join(outputPath, fileName));
+}
+
+async function chooseOutputFolder() {
+  try {
+    const outputPath = await new Promise((resolve, reject) => {
+      evalScript(
+        `var folder = Folder.selectDialog("Choose output directory");
+         folder ? folder.fsName : null;`,
+        (result) => {
+          if (result === "null" || result === null) {
+            resolve(null); // User cancelled
+          } else {
+            resolve(result);
+          }
+        }
+      );
+    });
+
+    if (outputPath) {
+      console.log("Selected folder:", outputPath);
+      return outputPath;
+    } else {
+      console.log("User cancelled folder selection");
+    }
+  } catch (e) {
+    console.error("Error:", e);
+  }
+}
+
+async function showProgressBar() {
+  document.getElementById("progress-container").style.display = "block";
+  await updateProgressBar(0);
+}
+
+function hideProgressBar() {
+  document.getElementById("progress-container").style.display = "none";
+}
+
+async function updateProgressBar(percent) {
+  const bar = document.getElementById("progress-bar");
+  bar.style.width = `${percent}%`;
+  await new Promise((resolve) => requestAnimationFrame(resolve));
+}
+
+(function () {
+  const originalLog = console.log;
+  console.log = function (...args) {
+    originalLog.apply(console, args);
+    appendLog(args.map(formatArg).join(" "));
+  };
+
+  const originalError = console.error;
+  console.error = function (...args) {
+    originalError.apply(console, args);
+    appendLog("ERROR: " + args.map(formatArg).join(" "));
+  };
+
+  // Helper to format arguments
+  function formatArg(arg) {
+    if (typeof arg === "object" && arg !== null) {
+      try {
+        return JSON.stringify(arg, null, 2);
+      } catch (e) {
+        return "[object]";
+      }
+    }
+    return String(arg);
+  }
+})();
+
+function appendLog(message) {
+  const logContainer = document.getElementById("logContainer");
+  const time = new Date().toLocaleTimeString();
+  const formattedMsg = `[${time}] ${message}`;
+  const logEntry = document.createElement("div");
+  logEntry.textContent = formattedMsg;
+  logContainer.appendChild(logEntry);
+  logContainer.scrollTop = logContainer.scrollHeight; // scroll to bottom
 }

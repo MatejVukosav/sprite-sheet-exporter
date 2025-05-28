@@ -57,3 +57,50 @@
   box-shadow: 0 1px 4px #0078d422;
   transform: scale(0.98);
 }
+
+.export-btn:disabled {
+  background: #aaa;
+  color: #fff;
+  cursor: not-allowed;
+  opacity: 0.6;
+  box-shadow: none;
+  transform: none;
+}
+
+#logContainer {
+  display: none; /* Hidden by default */
+  overflow-y: auto;
+  height: 200px;
+  background: #222;
+  color: #eee;
+  padding: 10px;
+  margin-top: 16px;
+  font-family: monospace;
+  white-space: pre-wrap;
+}
+
+#toggleLogsBtn {
+  cursor: pointer;
+  background: #444;
+  color: #eee;
+  border: none;
+  margin-top: 10px;
+  padding: 8px 12px;
+  font-family: monospace;
+}
+
+@keyframes pulse {
+  0% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.2);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
+#progress-bar.pulsing {
+  animation: pulse 1s infinite;
+}

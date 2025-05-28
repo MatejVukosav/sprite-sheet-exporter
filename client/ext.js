@@ -1,30 +1,55 @@
 const csInterface = new CSInterface();
 
 function loadJSX() {
-  csInterface.evalScript(
+  evalScript(
     `$.evalFile("${csInterface.getSystemPath(
       SystemPath.EXTENSION
     )}/host/renderFrames.jsx")`,
     function (result) {
-      console.log("Render result:", result);
+      if (result === "undefined") {
+        console.log("renderFrames script loaded successfully");
+      } else {
+        console.log("Issue while loading renderFrames script");
+      }
     }
   );
 
-  csInterface.evalScript(
+  evalScript(
     `$.evalFile("${csInterface.getSystemPath(
       SystemPath.EXTENSION
     )}/host/cleanExportedFrames.jsx")`,
     function (result) {
-      console.log("Delete result:", result);
+      if (result === "undefined") {
+        console.log("cleanExportedFrames script loaded successfully");
+      } else {
+        console.log("Issue while loading cleanExportedFrames script");
+      }
     }
   );
 
-  csInterface.evalScript(
+  evalScript(
     `$.evalFile("${csInterface.getSystemPath(
       SystemPath.EXTENSION
     )}/host/compositionInfo.jsx")`,
     function (result) {
-      console.log("Composition info result:", result);
+      if (result === "undefined") {
+        console.log("compositionInfo script loaded successfully");
+      } else {
+        console.log("Issue while loading compositionInfo script");
+      }
+    }
+  );
+
+  evalScript(
+    `$.evalFile("${csInterface.getSystemPath(
+      SystemPath.EXTENSION
+    )}/host/openFolder.jsx")`,
+    function (result) {
+      if (result === "undefined") {
+        console.log("openFolder script loaded successfully");
+      } else {
+        console.log("Issue while loading openFolder script");
+      }
     }
   );
 

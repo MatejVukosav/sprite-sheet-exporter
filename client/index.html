@@ -24,10 +24,9 @@
         padding: 0;
       }
       .main-container {
-        max-width: 410px;
-        margin: 32px auto;
+        max-width: auto;
+        height: auto;
         background: var(--panel);
-        border-radius: var(--radius);
         box-shadow: 0 4px 24px #0005;
         border: 1.5px solid var(--border);
         padding: 30px 28px 28px 28px;
@@ -138,8 +137,9 @@
     </style>
   </head>
   <body onload="onLoaded()">
-    <a href="javascript:history.go(0)">Refresh panel</a>
     <div class="main-container">
+      <a href="javascript:history.go(0)" style="color: white">Refresh panel</a>
+
       <div class="header">
         <span class="header-icon">🖼️</span>
         <span class="header-title">Sprite Sheet Exporter</span>
@@ -230,6 +230,32 @@
           </svg>
           Export Sprite Sheet
         </button>
+
+        <button id="toggleLogsBtn">Show Logs</button>
+
+        <div id="logContainer"></div>
+        <div
+          id="progress-container"
+          style="
+            display: none;
+            width: 100%;
+            background: #eee;
+            border: 1px solid #ccc;
+            height: 20px;
+            margin-top: 10px;
+          "
+        >
+          <div
+            id="progress-bar"
+            class="pulsing"
+            style="
+              width: 0%;
+              height: 100%;
+              background: #4caf50;
+              transition: width 0.3s;
+            "
+          ></div>
+        </div>
       </div>
     </div>
     <script type="text/javascript" src="CSInterface.js"></script>

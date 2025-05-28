@@ -25,17 +25,6 @@ function renderCompFrames(outputPath, prefix, format) {
 
     renderQueue.render();
 
-    // // Poll for completion (prevents blocking)
-    var maxWait = 300; // 5 minutes max (300 seconds)
-    var startTime = new Date().getTime();
-
-    while (app.project.renderQueue.isRendering) {
-      $.sleep(500); // Check every 0.5 seconds
-      if ((new Date().getTime() - startTime) / 1000 > maxWait) {
-        throw new Error("Render timed out after 5 minutes");
-      }
-    }
-
     return JSON.stringify({
       success: true,
     });
@@ -52,4 +41,8 @@ function renderCompFrames(outputPath, prefix, format) {
       renderQueueItem.remove();
     }
   }
+}
+
+function isRenderRunning() {
+  return JSON.stringify({ isRendering: app.project.renderQueue.isRendering });
 }
