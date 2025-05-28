@@ -17,7 +17,7 @@ A lightweight CEP extension for Adobe After Effects that exports the active comp
 
 ## 📸 Showcase
 
-https://github.com/user-attachments/assets/401602df-a12d-49ff-8311-90a82f1651e7
+https://github.com/user-attachments/assets/bb235276-e87c-4c7a-9b3a-c4766e67b44a
 
 ## 🧩 Technical Components
 
