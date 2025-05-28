@@ -298,7 +298,7 @@ function saveCanvas(canvas, outputPath, outputFormat) {
     fs.writeFile(outputPath, base64Data, "base64", (err) => {
       if (err) reject(err);
       else {
-        console.log(`Spritesheet saved to ${outputPath}`);
+        console.log(`✅ Spritesheet saved to ${outputPath}`);
         resolve();
       }
     });
@@ -397,7 +397,7 @@ function generateFrameData(
     path.join(outputPath, fileName),
     JSON.stringify(data, null, 2)
   );
-  console.log("Generated frame data JSON at:", path.join(outputPath, fileName));
+  console.log("✅ Generated frame data JSON at:", path.join(outputPath, fileName));
 }
 
 async function chooseOutputFolder() {
@@ -452,7 +452,7 @@ async function updateProgressBar(percent) {
   const originalError = console.error;
   console.error = function (...args) {
     originalError.apply(console, args);
-    appendLog("ERROR: " + args.map(formatArg).join(" "));
+    appendLog("❌ Error: " + args.map(formatArg).join(" "));
   };
 
   // Helper to format arguments

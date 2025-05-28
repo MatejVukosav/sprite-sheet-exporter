@@ -7,9 +7,9 @@ function loadJSX() {
     )}/host/renderFrames.jsx")`,
     function (result) {
       if (result === "undefined") {
-        console.log("renderFrames script loaded successfully");
+        console.log("✅ renderFrames script loaded successfully");
       } else {
-        console.log("Issue while loading renderFrames script");
+        console.log("❌ Issue while loading renderFrames script");
       }
     }
   );
@@ -20,9 +20,9 @@ function loadJSX() {
     )}/host/cleanExportedFrames.jsx")`,
     function (result) {
       if (result === "undefined") {
-        console.log("cleanExportedFrames script loaded successfully");
+        console.log("✅ cleanExportedFrames script loaded successfully");
       } else {
-        console.log("Issue while loading cleanExportedFrames script");
+        console.log("❌ Issue while loading cleanExportedFrames script");
       }
     }
   );
@@ -33,9 +33,9 @@ function loadJSX() {
     )}/host/compositionInfo.jsx")`,
     function (result) {
       if (result === "undefined") {
-        console.log("compositionInfo script loaded successfully");
+        console.log("✅ compositionInfo script loaded successfully");
       } else {
-        console.log("Issue while loading compositionInfo script");
+        console.log("❌ Issue while loading compositionInfo script");
       }
     }
   );
@@ -46,9 +46,9 @@ function loadJSX() {
     )}/host/openFolder.jsx")`,
     function (result) {
       if (result === "undefined") {
-        console.log("openFolder script loaded successfully");
+        console.log("✅ openFolder script loaded successfully");
       } else {
-        console.log("Issue while loading openFolder script");
+        console.log("❌ Issue while loading openFolder script");
       }
     }
   );
