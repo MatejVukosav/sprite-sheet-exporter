@@ -267,7 +267,7 @@ async function createSpritesheet(
     }
   }
 
-  const spritesheetFileName = "spritesheet" + outputFormat;
+  const spritesheetFileName = compositionName + "_spritesheet" + outputFormat;
   const spritesheetPath = path.join(outputPath, spritesheetFileName);
   await saveCanvas(canvas, spritesheetPath, outputFormat);
 
@@ -391,7 +391,7 @@ function generateFrameData(
     });
   }
 
-  const fileName = "spritesheet.json";
+  const fileName = compositionName + "_spritesheet.json";
 
   fs.writeFileSync(
     path.join(outputPath, fileName),
