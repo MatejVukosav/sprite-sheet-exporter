@@ -17,6 +17,8 @@ A lightweight CEP extension for Adobe After Effects that exports the active comp
 
 ## 📸 Showcase
 
+https://github.com/user-attachments/assets/401602df-a12d-49ff-8311-90a82f1651e7
+
 ## 🧩 Technical Components
 
 - Adobe ExtendScript (JSX)
