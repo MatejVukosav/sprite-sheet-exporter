@@ -77,13 +77,12 @@ Each frame's coordinates and dimensions are recorded in the exported JSON:
 
    ```bash
    git clone git@github.com:MatejVukosav/sprite-sheet-exporter.git
-   cd sprite-sheet-exporter
    ```
 
 2. Move to Adobe CEP extensions directory
 
    ```bash
-   mv sprite-sheet-exporter /Library/Application\ Support/Adobe/CEP/extensions
+   sudo mv sprite-sheet-exporter "/Library/Application Support/Adobe/CEP/extensions/"
    ```
 
 3. Open After Effects
