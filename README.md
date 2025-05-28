@@ -22,8 +22,15 @@ https://github.com/user-attachments/assets/bb235276-e87c-4c7a-9b3a-c4766e67b44a
 ## 🧩 Technical Components
 
 - Adobe ExtendScript (JSX)
-- Node.js Integration
+  - Use `CSInterface` to gather he active composition's dimensions and frame rate
+  - Render each frame to a temporary image sequence using the AE Render Queue
+- Node Processing
+  - Combine the image into a single sheet using `canvas`
+  - Produce a `JSON` file containing frame width/height and XY offsets
 - UI with CEP (Common Extensibility Platform)
+  - Vanilla JS panel listing current component info
+  - Export sprite sheet from active composition
+  - Live debug log and progress bar
 
 ## Project structure
 
