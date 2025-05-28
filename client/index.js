@@ -45,6 +45,7 @@ function setupEventHandlers() {
 
 async function handleExportSpriteSheet() {
   document.getElementById("exportSpriteSheet").disabled = true;
+  await showProgressBar();
   const outputPath = await chooseOutputFolder();
 
   if (!outputPath) {
@@ -55,7 +56,6 @@ async function handleExportSpriteSheet() {
   const prefix = "frame_[#####]";
   const format = ".png";
 
-  await showProgressBar();
   await updateProgressBar(20);
 
   evalScript(
@@ -86,8 +86,6 @@ async function processRender(result, outputPath, prefix, format) {
         function (result) {
           if (result === "true") {
             console.log("Folder opened!");
-          } else {
-            console.error("Folder not found!");
           }
         }
       );
@@ -417,7 +415,7 @@ async function chooseOutputFolder() {
 
 async function showProgressBar() {
   document.getElementById("progress-container").style.display = "block";
-  await updateProgressBar(0);
+  await updateProgressBar(10);
 }
 
 function hideProgressBar() {
