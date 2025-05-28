@@ -98,19 +98,26 @@ Uncomment the following line in `client/index.html` to enable manual refresh dur
 <!-- <a href="javascript:history.go(0)" style="color: white">Refresh panel</a> -->
 ```
 
-This allows you to refresh the panel manually while developing.
-
 ### Script Loading Feedback
 
 Logs indicate successful script loading:
 
 ```bash
-✅  cleanExportedFrames script loaded successfully
+✅ cleanExportedFrames script loaded successfully
 ❌ Issue while loading compositionInfo script
 ```
 
-🌐 Access During Dev
+### 🌐 Access During Dev
+
 Access the extension UI in the browser by navigating to: `http://localhost:8083`
+
+### Load example composition
+
+Install LottieFiles extension by navigating to Window → Find Extensions on Exchange
+
+1. Search for `LottieFiles for After Effects`
+2. Open LottieFiles extension in Adobe Effects; Window → Extensions → LottieFiles
+3. Select one of existing components from `Explore` tab
 
 ## 📄License
 
