@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 
 let currentNumFrames = 0;
+let compositionName = "";
 
 // --- Initialization ---
 document.addEventListener("jsxLoaded", (e) => {
@@ -53,20 +54,22 @@ async function handleExportSpriteSheet() {
     return;
   }
 
-  const prefix = "frame_[#####]";
+  const prefix = compositionName + "_frame_[#####]";
   const format = ".png";
+  const outputFormat = document.getElementById("spritesheetFormat").value;
+  console.log("Spritesheet output format is: ", outputFormat);
 
   await updateProgressBar(20);
 
   evalScript(
     `renderCompFrames("${outputPath}", "${prefix}", "${format}")`,
     async (result) => {
-      await processRender(result, outputPath, prefix, format);
+      await processRender(result, outputPath, prefix, format, outputFormat);
     }
   );
 }
 
-async function processRender(result, outputPath, prefix, format) {
+async function processRender(result, outputPath, prefix, format, outputFormat) {
   try {
     const res = JSON.parse(result);
     if (res.success) {
@@ -78,7 +81,8 @@ async function processRender(result, outputPath, prefix, format) {
         0,
         currentNumFrames - 1,
         outputPath,
-        format
+        format,
+        outputFormat
       );
       await updateProgressBar(100);
       evalScript(
@@ -121,11 +125,12 @@ function updateCompInfo() {
       noCompPanel.hidden = true;
       compDetailsPanel.hidden = false;
 
+      compositionName = comp.name;
       currentNumFrames = comp.numFrames || 0;
 
       console.log("Active Composition Info:", comp);
       updateCompDetails({
-        name: comp.name,
+        name: compositionName,
         width: comp.width,
         height: comp.height,
         frameRate: comp.frameRate.toFixed(2),
@@ -171,7 +176,8 @@ async function createSpritesheet(
   startFrame,
   endFrame,
   outputPath,
-  format
+  format,
+  outputFormat
 ) {
   console.log("Creating spritesheet");
   const framePaths = generateFrameFilenames(
@@ -261,9 +267,9 @@ async function createSpritesheet(
     }
   }
 
-  const spritesheetFileName = "spritesheet.png";
+  const spritesheetFileName = "spritesheet" + outputFormat;
   const spritesheetPath = path.join(outputPath, spritesheetFileName);
-  await saveCanvas(canvas, spritesheetPath);
+  await saveCanvas(canvas, spritesheetPath, outputFormat);
 
   generateFrameData(
     frameWidth,
@@ -276,11 +282,19 @@ async function createSpritesheet(
 }
 
 // Save canvas as PNG file
-function saveCanvas(canvas, outputPath) {
+function saveCanvas(canvas, outputPath, outputFormat) {
   console.log("Saving canvas to:", outputPath);
   return new Promise((resolve, reject) => {
-    const dataURL = canvas.toDataURL("image/png");
-    const base64Data = dataURL.replace(/^data:image\/png;base64,/, "");
+    var dataURL;
+    var base64Data;
+    if (outputFormat === ".png") {
+      dataURL = canvas.toDataURL("image/png");
+      base64Data = dataURL.replace(/^data:image\/png;base64,/, "");
+    } else {
+      dataURL = canvas.toDataURL("image/webp", 0.95);
+      base64Data = dataURL.replace(/^data:image\/webp;base64,/, "");
+    }
+
     fs.writeFile(outputPath, base64Data, "base64", (err) => {
       if (err) reject(err);
       else {
